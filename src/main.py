@@ -9,13 +9,19 @@ class Evaluator:
         self.output = output
 
     def tune(self):
+        '''
+            チューニングを実施
+        '''
         study = optuna.create_study()
         study.optimize(self.do_trial(), n_trials=300)
         print(study.best_params)
 
-        return study.best_params['bottom'], study.best_params['top']
+        return study.best_params
 
     def do_trial(self):
+        '''
+            評価関数を定義
+        '''
         def objective(trial):
             bottom = trial.suggest_int('bottom', 0, 255)
             top = trial.suggest_int('top', 0, 255)
@@ -25,11 +31,17 @@ class Evaluator:
         return objective
 
     def apply(self, bottom, top):
+        '''
+            画像処理を実装
+        '''
         ret, upper = cv2.threshold(self.input, bottom, 255, cv2.THRESH_BINARY)
         ret, lower = cv2.threshold(self.input, top, 255, cv2.THRESH_BINARY_INV)
         return cv2.bitwise_and(upper, lower)
 
     def evaluate(self, target):
+        '''
+            精度評価
+        '''
         # 精度評価
         # print(target)
         # print(output)
@@ -43,9 +55,10 @@ if __name__ == "__main__":
     input = cv2.imread("data_sample/grad.png")
     output = cv2.imread("data_sample/grad_out.png")
     evaluator = Evaluator(input, output)
-    bottom, top = evaluator.tune()
+    best_params = evaluator.tune()
     evaluator.evaluate(input)
-    res = evaluator.apply(bottom, top)
+    res = evaluator.apply(best_params['bottom'], best_params['top'])
+
     cv2.imshow("gt", output)
     cv2.imshow("estimation", res)
     cv2.imshow("mine", evaluator.apply(130, 140))
