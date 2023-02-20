@@ -10,9 +10,7 @@ class Evaluator:
 
     def tune(self):
         study = optuna.create_study()
-        study.optimize(self.do_trial(), n_trials=500)
-        bottom = 0
-        top = 255
+        study.optimize(self.do_trial(), n_trials=300)
         print(study.best_params)
 
         return study.best_params['bottom'], study.best_params['top']
@@ -42,8 +40,8 @@ class Evaluator:
 
 
 if __name__ == "__main__":
-    input = cv2.imread("data/grad.png")
-    output = cv2.imread("data/grad_out.png")
+    input = cv2.imread("data_sample/grad.png")
+    output = cv2.imread("data_sample/grad_out.png")
     evaluator = Evaluator(input, output)
     bottom, top = evaluator.tune()
     evaluator.evaluate(input)
