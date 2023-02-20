@@ -10,7 +10,7 @@ class Evaluator:
 
     def tune(self):
         study = optuna.create_study()
-        study.optimize(self.do_trial(), n_trials=100)
+        study.optimize(self.do_trial(), n_trials=500)
         bottom = 0
         top = 255
         print(study.best_params)
